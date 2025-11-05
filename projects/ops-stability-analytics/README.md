@@ -1,5 +1,10 @@
 # Ops Stability & Talent Performance Analytics
 
+[![CI/CD](https://github.com/KikeMarakas90/dev-pro-portfolio/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/KikeMarakas90/dev-pro-portfolio/actions/workflows/ci.yml)
+[![Python](https://img.shields.io/badge/Python-3.12-blue?logo=python)](https://www.python.org/)
+[![Fabric Ready](https://img.shields.io/badge/Fabric%20Ready-lakehouse--sim-brightgreen?logo=microsoft)](https://learn.microsoft.com/en-us/fabric/)
+[![License](https://img.shields.io/github/license/KikeMarakas90/dev-pro-portfolio?color=green)](../../LICENSE)
+
 **Tagline:** KPIs de estabilidad operativa y desempeño con trazabilidad ética, listos para entrevista.
 
 Este repositorio demuestra un caso end-to-end: generación de datos sintéticos, ETL, KPIs de estabilidad (CV / CVM), outliers, segmentación por cuartiles y una capa de medidas DAX para un dashboard (Power BI). Incluye CI con `pytest` para validar cálculos.
