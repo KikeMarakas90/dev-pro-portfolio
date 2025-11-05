@@ -1,7 +1,91 @@
-.venv/
+# ===========================================================
+# AEDRON | Dev Pro Portfolio - Global .gitignore
+# ===========================================================
+# Covers: Python, Power BI, Docker, VSCode, and CI/CD artifacts
+# ===========================================================
+
+# --- Python cache and compiled files ---
 __pycache__/
-*.pyc
+*.py[cod]
+*$py.class
+*.so
 *.pyo
-*.pyd
-*.DS_Store
-.env
+
+# --- Virtual environments ---
+.venv/
+venv/
+env/
+ENV/
+
+# --- Build and distribution ---
+build/
+dist/
+*.egg-info/
+.eggs/
+
+# --- Logs and temp files ---
+*.log
+*.tmp
+*.bak
+*.swp
+*.swo
+*.pid
+
+# --- Coverage and test artifacts ---
+.pytest_cache/
+.coverage
+.tox/
+htmlcov/
+.cache/
+
+# --- Jupyter Notebooks ---
+.ipynb_checkpoints/
+*.nbconvert.ipynb
+
+# --- Power BI and analytics files ---
+*.pbix
+*.pbit
+*.xlsx
+*.csv
+*.parquet
+*.json
+*.zip
+
+# --- Simulated lakehouse data (local) ---
+lakehouse_sim/
+data/
+output/
+datasets/
+
+# --- OS / Editor files ---
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+*.code-workspace
+
+# --- Docker ---
+docker-compose.override.yml
+*.env
+.env.*
+.envrc
+Dockerfile.local
+.dockerignore
+
+# --- Node / Frontend (for future modules) ---
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+package-lock.json
+pnpm-lock.yaml
+
+# --- GitHub Actions / CI ---
+# Ignore local secrets or temp artifacts in workflows
+.github/secrets/
+.github/tmp/
+
+# --- Optional local scripts ---
+scripts/local_*
+notes/
+tmp/
