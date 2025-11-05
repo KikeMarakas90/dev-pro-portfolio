@@ -7,10 +7,13 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
 
-      - uses: actions/setup-python@v5
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
         with:
           python-version: '3.11'
 
@@ -19,6 +22,19 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
+          pip install jupyter nbconvert
+
+      - name: Prepare lakehouse folders
+        working-directory: projects/ops-stability-analytics
+        run: |
+          mkdir -p lakehouse_sim/Files/raw
+          mkdir -p lakehouse_sim/Tables
+
+      - name: Execute notebooks (ETL + KPIs)
+        working-directory: projects/ops-stability-analytics
+        run: |
+          jupyter nbconvert --to notebook --execute 01_Generate_Synthetic_Data.ipynb --inplace
+          jupyter nbconvert --to notebook --execute 02_Calculate_KPIs.ipynb --inplace
 
       - name: Run tests (subproject)
         working-directory: projects/ops-stability-analytics

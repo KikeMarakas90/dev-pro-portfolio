@@ -1,77 +1,133 @@
-import pandas as pd
-import numpy as np
-from pathlib import Path
+from __future__ import annotations
 
+from pathlib import Path
+import numpy as np
+import pandas as pd
+
+__all__ = [
+    "coef_variacion",
+    "coef_variacion_mediana",
+    "iqr_bounds",
+    "build_daily",
+    "build_agent_weekly",
+    "compute_stability",
+    "flag_outliers",
+]
+
+# -----------------------------
+# Métricas estadísticas (APIs)
+# -----------------------------
 def coef_variacion(series: pd.Series) -> float:
+    """Coeficiente de variación basado en media (std/mean)."""
     m = series.mean()
     s = series.std(ddof=1)
     return float(s / m) if m != 0 else np.nan
 
 def coef_variacion_mediana(series: pd.Series) -> float:
-    # CV basado en mediana: 1.4826 * MAD / mediana
+    """Coeficiente de variación robusto basado en mediana y MAD."""
     med = series.median()
     mad = (series - med).abs().median()
     return float(1.4826 * mad / med) if med != 0 else np.nan
 
-def iqr_bounds(series: pd.Series, k: float = 1.5):
+def iqr_bounds(series: pd.Series, k: float = 1.5) -> tuple[float, float]:
+    """Límites inferior/superior por IQR para detección de outliers."""
     q1, q3 = series.quantile([0.25, 0.75])
     iqr = q3 - q1
-    return q1 - k*iqr, q3 + k*iqr
+    return (q1 - k * iqr, q3 + k * iqr)
 
+# -----------------------------
+# Transformaciones intermedias
+# -----------------------------
 def build_daily(df: pd.DataFrame) -> pd.DataFrame:
-    return df.copy()
+    """Normaliza tipos base de la capa diaria (evita SettingWithCopy)."""
+    out = df.copy()
+    out["date"] = pd.to_datetime(out["date"])
+    return out
 
 def build_agent_weekly(df: pd.DataFrame) -> pd.DataFrame:
-    df['date'] = pd.to_datetime(df['date'])
-    df['week'] = df['date'].dt.isocalendar().week.astype(int)
-    grp = df.groupby(['agent_id','team_id','week'], as_index=False).agg(
-        hours_mean=('productive_hours','mean'),
-        cases_mean=('cases_closed','mean')
+    """Agrega métricas semanales por agente/equipo."""
+    out = df.copy()
+    out["week"] = out["date"].dt.isocalendar().week.astype(int)
+    grp = out.groupby(["agent_id", "team_id", "week"], as_index=False).agg(
+        hours_mean=("productive_hours", "mean"),
+        cases_mean=("cases_closed", "mean"),
     )
     return grp
 
 def compute_stability(df_week: pd.DataFrame) -> pd.DataFrame:
-    # estabilidad por agente en el periodo completo
-    by_agent = df_week.groupby(['agent_id','team_id']).agg(
-        cv_hours=('hours_mean', coef_variacion),
-        cvm_hours=('hours_mean', coef_variacion_mediana),
-        cv_cases=('cases_mean', coef_variacion),
-        cvm_cases=('cases_mean', coef_variacion_mediana)
+    """Calcula CV/CVM de horas y casos por agente; asigna cuartil de estabilidad."""
+    by_agent = df_week.groupby(["agent_id", "team_id"]).agg(
+        cv_hours=("hours_mean", coef_variacion),
+        cvm_hours=("hours_mean", coef_variacion_mediana),
+        cv_cases=("cases_mean", coef_variacion),
+        cvm_cases=("cases_mean", coef_variacion_mediana),
     ).reset_index()
 
-    # cuartiles por equipo
-    def quartile(s: pd.Series):
-        return pd.qcut(s, 4, labels=[1,2,3,4], duplicates='drop')
+    # Cuartiles (1..4). Menor CV = más estable.
+    base = by_agent["cv_hours"]
+    by_agent["quartile_efficiency"] = pd.qcut(
+        base.fillna(base.median()),
+        4,
+        labels=[1, 2, 3, 4],
+        duplicates="drop",
+    ).astype("int64", errors="ignore")
 
-    by_agent['quartile_efficiency'] = quartile(by_agent['cv_hours'].fillna(by_agent['cv_hours'].median()))
     return by_agent
 
 def flag_outliers(df_week: pd.DataFrame) -> pd.DataFrame:
-    # outliers por agente/semana en horas y casos
-    bounds_h = df_week.groupby('team_id')['hours_mean'].apply(iqr_bounds).to_dict()
-    bounds_c = df_week.groupby('team_id')['cases_mean'].apply(iqr_bounds).to_dict()
+    """
+    Marca outliers por equipo y semana usando IQR sobre 'hours_mean' y 'cases_mean'.
+    Implementación con groupby(...).transform(...) para evitar deprecations y
+    problemas de índice en pandas 2.x.
+    """
+    out = df_week.copy()
 
-    def is_out_h(row):
-        lo, hi = bounds_h[row['team_id']]
-        return int(row['hours_mean'] < lo or row['hours_mean'] > hi)
+    def flag_series(s: pd.Series) -> pd.Series:
+        lo, hi = iqr_bounds(s)
+        return (s.lt(lo) | s.gt(hi)).astype(int)
 
-    def is_out_c(row):
-        lo, hi = bounds_c[row['team_id']]
-        return int(row['cases_mean'] < lo or row['cases_mean'] > hi)
+    out["out_hours_flag"] = (
+        out.groupby(["team_id", "week"])["hours_mean"].transform(flag_series)
+    )
+    out["out_cases_flag"] = (
+        out.groupby(["team_id", "week"])["cases_mean"].transform(flag_series)
+    )
+    return out
 
-    df_week['out_hours_flag'] = df_week.apply(is_out_h, axis=1)
-    df_week['out_cases_flag'] = df_week.apply(is_out_c, axis=1)
-    return df_week
-
+# -----------------------------
+# Ejecución como script (E2E)
+# -----------------------------
 if __name__ == "__main__":
-    raw = pd.read_csv("data/raw/ops_daily.csv")
+    # Preferimos Parquet del lakehouse local.
+    lh_root = Path("lakehouse_sim")
+    raw_parquet = lh_root / "Files" / "raw" / "ops_daily.parquet"
+
+    if raw_parquet.exists():
+        raw = pd.read_parquet(raw_parquet)
+    else:
+        # Fallback a CSV legacy (compatibilidad hacia atrás)
+        raw_csv = Path("data/raw/ops_daily.csv")
+        if not raw_csv.exists():
+            raise FileNotFoundError(
+                f"No se encontró {raw_parquet} ni {raw_csv}. "
+                "Ejecuta primero la generación de datos."
+            )
+        raw = pd.read_csv(raw_csv)
+
     daily = build_daily(raw)
     weekly = build_agent_weekly(daily)
     stability = compute_stability(weekly)
     weekly_flagged = flag_outliers(weekly)
 
-    Path("data/processed").mkdir(parents=True, exist_ok=True)
-    stability.to_csv("data/processed/agent_stability.csv", index=False)
-    weekly_flagged.to_csv("data/processed/weekly_flags.csv", index=False)
+    # Salidas alineadas a lakehouse_sim (Parquet)
+    tables_dir = lh_root / "Tables"
+    tables_dir.mkdir(parents=True, exist_ok=True)
 
-    print("Wrote data/processed/agent_stability.csv and weekly_flags.csv")
+    out_agent = tables_dir / "agent_stability.parquet"
+    out_weekly = tables_dir / "weekly_flags.parquet"
+
+    stability.to_parquet(out_agent, index=False)
+    weekly_flagged.to_parquet(out_weekly, index=False)
+
+    print(f"✅ Wrote {len(stability)} rows → {out_agent}")
+    print(f"✅ Wrote {len(weekly_flagged)} rows → {out_weekly}")
