@@ -1,23 +1,29 @@
-# Byte-compiled / optimized / DLL files
+# ===========================================================
+# AEDRON | Ops Stability Analytics - Local .gitignore
+# ===========================================================
+# Specific ignores for this Fabric-ready local project
+# ===========================================================
+
+# --- Local virtual environment (redundant safeguard) ---
+.venv/
+
+# --- Data lake simulation ---
+lakehouse_sim/Files/
+lakehouse_sim/Tables/
+
+# --- Temporary exports ---
+*.csv
+*.parquet
+
+# --- Notebook checkpoints and outputs ---
+.ipynb_checkpoints/
+*.nbconvert.ipynb
+
+# --- Python cache / compiled ---
 __pycache__/
 *.py[cod]
-*$py.class
 
-# Virtual environments
-.venv/
-venv/
-
-# Jupyter
-.ipynb_checkpoints/
-
-# Data
-data/raw/*
-!data/raw/.gitkeep
-data/processed/*
-!data/processed/.gitkeep
-
-# OS
-.DS_Store
-
-# VSCode
-.vscode/
+# --- Logs / temp files ---
+*.log
+*.tmp
+*.bak
