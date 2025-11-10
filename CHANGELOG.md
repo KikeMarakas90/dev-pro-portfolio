@@ -83,6 +83,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 **Jorge Enrique Rodríguez Aguilera**  
 _Consultor en Business Intelligence, Cloud Integrations & Data Governance_  
 📍 México  
+<<<<<<< HEAD
 🔗 [LinkedIn](https://www.linkedin.com/in/enrique-rodr%C3%ADguez-007236243)
 
 ## [1.0.0] - 2025-11-10
@@ -121,3 +122,6 @@ Esta versión entrega una base productiva completa que integra generación de da
 **Fecha:** 2025-11-10  
 **Estado:** ✅ Versión base estable — lista para la siguiente iteración (v1.1.x con matriz de pruebas y pipelines reforzados)
 
+=======
+🔗 [LinkedIn](https://www.linkedin.com/in/enrique-rodr%C3%ADguez-007236243)
+>>>>>>> origin/main
