@@ -1,13 +1,44 @@
 services:
   db:
     image: postgres:16
-    environment:
-      POSTGRES_PASSWORD: ops
-      POSTGRES_USER: ops
-      POSTGRES_DB: opsdb
+    container_name: ops_db
+    env_file:
+      - .env.local                   # POSTGRES_USER/POSTGRES_PASSWORD/POSTGRES_DB
     ports:
       - "5432:5432"
+    volumes:
+      - ./docker/pgdata:/var/lib/postgresql/data
+      - ./docker/postgres.conf:/etc/postgresql/postgresql.conf:ro
+      - ./docker/pg_hba.conf:/etc/postgresql/pg_hba.conf:ro
+      # (TLS opcional) Descomenta si usas certificados
+      # - ./docker/ssl/server.crt:/etc/postgresql/ssl/server.crt:ro
+      # - ./docker/ssl/server.key:/etc/postgresql/ssl/server.key:ro
+    command:
+      - "-c"
+      - "config_file=/etc/postgresql/postgresql.conf"
+      - "-c"
+      - "hba_file=/etc/postgresql/pg_hba.conf"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+    networks:
+      - ops_net
+
   adminer:
-    image: adminer
+    image: adminer:4
+    container_name: ops_adminer
     ports:
       - "8080:8080"
+    depends_on:
+      db:
+        condition: service_healthy
+    restart: unless-stopped
+    networks:
+      - ops_net
+
+networks:
+  ops_net:
+    driver: bridge
