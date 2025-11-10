@@ -65,6 +65,18 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
+      - name: Prepare env files for CI (SQL)
+        run: |
+          cat > .env <<'EOF'
+          POSTGRES_DB=ops_analytics
+          POSTGRES_USER=ops_user
+          POSTGRES_PASSWORD=ops_pass
+          POSTGRES_PORT=5432
+          POSTGRES_HOST=db
+          EOF
+          cp .env .env.local
+          echo "✅ .env and .env.local created for CI"
+
       - name: Launch DB containers
         run: docker compose up -d
 
@@ -76,15 +88,13 @@ jobs:
           done
 
       - name: Run E2E SQL pipeline
-        # usa el Makefile del subproyecto
-        working-directory: projects/ops-stability-analytics-sql
         env:
           ENV_FILE: .env.local
         run: make e2e-sql
 
       - name: Cleanup
         if: always()
-        run: docker compose down -v
+        run: docker compose down -v || true
 
   conventional:
     name: 🔎 Conventional Commits
