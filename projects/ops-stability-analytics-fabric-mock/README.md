@@ -1,51 +1,78 @@
-# Ops Stability & Talent Performance Analytics
+# Fabric Mock Module (`ops-stability-analytics-fabric-mock`)
 
-[![CI/CD](https://github.com/KikeMarakas90/dev-pro-portfolio/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/KikeMarakas90/dev-pro-portfolio/actions/workflows/ci.yml)
 [![Python](https://img.shields.io/badge/Python-3.12-blue?logo=python)](https://www.python.org/)
-[![Fabric Ready](https://img.shields.io/badge/Fabric%20Ready-lakehouse--sim-brightgreen?logo=microsoft)](https://learn.microsoft.com/en-us/fabric/)
-[![License](https://img.shields.io/github/license/KikeMarakas90/dev-pro-portfolio?color=green)](../../LICENSE)
+[![Power BI](https://img.shields.io/badge/PowerBI-Fabric%20Compatible-yellow?logo=powerbi)](https://powerbi.microsoft.com/)
+[![Parquet](https://img.shields.io/badge/Format-Parquet-orange?logo=apacheparquet)](https://parquet.apache.org/)
+[![License](https://img.shields.io/badge/License-MIT-green)](../LICENSE)
 
-**Tagline:** KPIs de estabilidad operativa y desempeño con trazabilidad ética, listos para entrevista.
+---
 
-Este repositorio demuestra un caso end-to-end: generación de datos sintéticos, ETL, KPIs de estabilidad (CV / CVM), outliers, segmentación por cuartiles y una capa de medidas DAX para un dashboard (Power BI). Incluye CI con `pytest` para validar cálculos.
+## Overview / Descripción General
 
-## Pitch de entrevista (30 segundos)
-Construí un pipeline reproducible que simula operaciones y desempeño por agente, calcula estabilidad con enfoques robustos (mediana y IQR), clasifica por cuartiles y entrega medidas DAX listas para Power BI. La repo trae CI, pruebas unitarias, docker-compose con Postgres y una guía para levantar todo en 10 minutos.
+Simulated environment for **operational stability analytics** using **synthetic data**  
+to validate Power BI and Microsoft Fabric pipelines.
 
-## Arquitectura
-```mermaid
-flowchart LR
-  A[Sintetizador de datos] --> B[ETL Python]
-  B --> C[(Postgres)]
-  C --> D[KPIs (Python)]
-  D --> E[Medidas DAX / Power BI]
-  E --> F[Dashboard / Entrevista]
-```
+Entorno simulado para análisis de **estabilidad operativa** mediante **datos sintéticos**,  
+diseñado para validar transformaciones y modelos DAX en Power BI / Fabric.
 
-## Quickstart
+---
+
+## Execution / Ejecución
+
+### Activate root environment
+
 ```bash
-# 1) Crear venv
-python -m venv .venv && source .venv/bin/activate  # Windows: .venv\Scripts\activate
-
-# 2) Instalar dependencias
-pip install -r requirements.txt
-
-# 3) Generar datos + KPIs
-python src/etl/generate_synthetic_data.py
-python src/analytics/kpi_calculations.py
-
-# 4) Correr pruebas
-pytest -q
+source ../../.venv/bin/activate
 ```
 
-## Contenido clave
-- `src/etl/generate_synthetic_data.py`: genera dataset realista (agente, equipo, fecha, horas productivas, casos resueltos, etc.).
-- `src/analytics/kpi_calculations.py`: calcula CV, CVM, flags de outlier e índices de eficiencia relativa.
-- `dashboard/PowerBI/Measures_DAX.md`: medidas DAX listas para pegar en tu modelo.
-- `docs/architecture.md`: decisiones de diseño y diagrama.
-- CI con `pytest` en `.github/workflows/ci.yml`.
+### Run local tests
 
-## Roadmap corto
-- [ ] Cargar a Postgres con `load_to_postgres.py` (opcional)
-- [ ] Publicar dashboard en Fabric/Service (si aplica)
-- [ ] Añadir notebook con EDA
+```bash
+pytest -q --tb=short --disable-warnings
+```
+
+### Generate stability outputs
+
+```bash
+python src/analytics/kpi_calculations.py
+```
+
+## Outputs are stored in:
+
+```
+lakehouse_sim/Files/enriched/
+lakehouse_sim/Tables/
+```
+
+## Structure / Estructura
+
+```
+ops-stability-analytics-fabric-mock/
+├─ src/
+│  ├─ analytics/
+│  │  ├─ kpi_calculations.py
+│  │  └─ __init__.py
+│  └─ __main__.py
+├─ tests/
+│  ├─ test_kpi_flags.py
+│  └─ test_stability.py
+├─ Makefile
+├─ requirements.txt
+└─ README.md
+```
+
+## Key Features / Características Clave
+
+- CV / CVM computation for operational stability
+
+- Outlier detection via IQR
+
+- Compatibility with Fabric Lakehouse structure
+
+- Unit-tested DAX-aligned logic
+
+---
+
+**Status: ✅ Stable**
+
+**Version: 1.0.0** 

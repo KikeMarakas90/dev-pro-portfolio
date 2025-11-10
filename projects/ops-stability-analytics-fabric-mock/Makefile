@@ -1,73 +1,32 @@
-# ===========================================================
-# AEDRON | Ops Stability Analytics - Makefile
-# ===========================================================
-# Descripción:
-# Automatiza la ejecución local del pipeline Fabric-ready:
-# 1. Configura entorno virtual
-# 2. Ejecuta scripts de ETL y KPI
-# 3. Corre pruebas unitarias
-# 4. Permite limpiar o desactivar entorno
-# ===========================================================
+# ===== Fabric-mock Makefile =====
+PYTHON ?= ../../.venv/bin/python
+PIP    ?= ../../.venv/bin/pip
 
-PYTHON := python
-VENV := .venv
-ACTIVATE := source $(VENV)/bin/activate
+SRC_DIR := src
+ETL     := $(SRC_DIR)/etl/generate_synthetic_data.py
+KPI     := $(SRC_DIR)/analytics/kpi_calculations.py
 
-# ----------------------------------------
-#  Inicialización del entorno virtual
-# ----------------------------------------
-init:
-	@echo "🧱 Creando entorno virtual..."
-	$(PYTHON) -m venv $(VENV)
-	@$(ACTIVATE) && pip install --upgrade pip && pip install -r requirements.txt
-	@echo "✅ Entorno listo."
+.PHONY: deps run generate kpi test smoke e2e clean
 
-# ----------------------------------------
-#  Ejecución del pipeline (ETL + KPIs)
-# ----------------------------------------
-run:
-	@echo "🚀 Ejecutando pipeline completo..."
-	@$(ACTIVATE) && \
-	$(PYTHON) src/etl/generate_synthetic_data.py && \
-	$(PYTHON) src/analytics/kpi_calculations.py && \
-	pytest -q --tb=short --disable-warnings
-	@echo "✅ Pipeline completado con éxito."
+deps:
+	$(PIP) install -r requirements.txt
 
-# ----------------------------------------
-#  Pruebas unitarias
-# ----------------------------------------
+generate:
+	$(PYTHON) $(ETL) --format parquet --outdir lakehouse_sim/Files/raw
+
+kpi:
+	$(PYTHON) $(KPI)
+
+run: generate kpi
+
 test:
-	@echo "🧪 Ejecutando pruebas unitarias..."
-	@$(ACTIVATE) && pytest -q --tb=short --disable-warnings
+	pytest -q --tb=short --disable-warnings
 
-# ----------------------------------------
-#  Limpieza (archivos temporales y datos)
-# ----------------------------------------
+smoke: run test
+	@echo "✅ Fabric-mock smoke OK"
+
+e2e: deps run test
+	@echo "🏁 Fabric-mock E2E OK"
+
 clean:
-	@echo "🧹 Limpiando artefactos..."
-	rm -rf __pycache__ .pytest_cache
-	rm -rf lakehouse_sim/Files/raw/*.parquet
-	rm -rf lakehouse_sim/Tables/*.parquet
-	@echo "✅ Limpieza completada."
-
-# ----------------------------------------
-#  Desactivar entorno virtual
-# ----------------------------------------
-deactivate:
-	@echo "🔒 Desactivando entorno virtual..."
-	deactivate || true
-	@echo "✅ Entorno desactivado."
-
-# ----------------------------------------
-#  Ayuda
-# ----------------------------------------
-help:
-	@echo ""
-	@echo "Comandos disponibles:"
-	@echo "  make init         → Crear e inicializar entorno virtual"
-	@echo "  make run          → Ejecutar pipeline completo"
-	@echo "  make test         → Ejecutar pruebas unitarias"
-	@echo "  make clean        → Limpiar artefactos temporales"
-	@echo "  make deactivate   → Desactivar entorno virtual"
-	@echo ""
-	
+	rm -rf lakehouse_sim/Files/raw/*.parquet lakehouse_sim/Tables/*.parquet
