@@ -1,0 +1,40 @@
+name: Nightly Smoke • Integrity test
+
+on:
+  schedule:
+    - cron: '0 4 * * *'  # every day 04:00 UTC
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  smoke-fabric:
+    name: 🌙 Fabric synthetic smoke
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install
+        run: pip install -r projects/ops-stability-analytics-fabric-mock/requirements.txt
+      - name: Generate & validate synthetic data
+        working-directory: projects/ops-stability-analytics-fabric-mock
+        run: |
+          python src/etl/generate_synthetic_data.py
+          python src/analytics/kpi_calculations.py
+
+  smoke-sql:
+    name: 🧩 SQL seed smoke
+    runs-on: ubuntu-latest
+    needs: smoke-fabric
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install deps
+        run: pip install -r projects/ops-stability-analytics-sql/requirements.txt
+      - name: Run E2E SQL
+        run: make e2e-sql

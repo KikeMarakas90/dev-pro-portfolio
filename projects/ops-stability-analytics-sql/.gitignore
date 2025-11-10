@@ -1,0 +1,69 @@
+# ----------------------------------------
+# 🧱 AEDRON / OPS-STABILITY-ANALYTICS-SQL
+# Environment: Docker + Postgres + Python
+# ----------------------------------------
+
+# 🧩 Python cache & virtualenv
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.py.class
+.venv/
+.env/
+.env.local
+.pytest_cache/
+.mypy_cache/
+.dmypy.json
+
+# 📦 Build / distribution artifacts
+build/
+dist/
+*.egg-info/
+*.egg
+*.whl
+
+# ⚙️ IDEs / editors / system files
+.vscode/
+.idea/
+*.swp
+*.swo
+.DS_Store
+Thumbs.db
+
+# 🐳 Docker / Postgres runtime
+docker/pgdata/
+docker/logs/
+docker/tmp/
+*.pid
+*.log
+*.lock
+
+# 🧮 Database artifacts
+*.db
+*.sql~
+*.dump
+*.backup
+
+# 🪣 Parquet & data outputs
+lakehouse_sim/
+data/
+tmp/
+*.parquet
+*.csv
+
+# 🧪 Test reports
+.coverage
+htmlcov/
+junit.xml
+pytestdebug.log
+
+# 🔐 Sensitive config
+*.key
+*.crt
+*.pem
+secrets.json
+
+# 🧾 CI/CD
+.github/workflows/*.tmp
+__pypackages__/
