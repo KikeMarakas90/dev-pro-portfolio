@@ -84,3 +84,40 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 _Consultor en Business Intelligence, Cloud Integrations & Data Governance_  
 📍 México  
 🔗 [LinkedIn](https://www.linkedin.com/in/enrique-rodr%C3%ADguez-007236243)
+
+## [1.0.0] - 2025-11-10
+### 🚀 Changes
+
+This marks the first stable release of the Dev Pro Portfolio repository — consolidating a unified, test-driven architecture for analytics pipelines.
+It delivers a complete, production-ready baseline integrating Fabric mock generation and SQL E2E validation under a modular, CI/CD-enabled structure.
+
+**Key Deliverables:**
+- 🧱 SQL Pipeline: Full end-to-end (E2E) flow using Docker, PostgreSQL, and dynamic seed generation.
+- 🧪 Fabric Mock Module: Synthetic data generation and KPI analytics with test coverage.
+- ⚙️ Unified Makefiles: Standardized execution across projects (generate, test, e2e, clean).
+- 🔄 CI/CD Workflows: Automated testing, notebook execution, lint validation, and Conventional Commits check.
+- 🗂️ Bilingual Documentation: Architecture overview, changelog automation, and consistent README structure.
+
+**Version:** v1.0.0  
+**Date:** 2025-11-10  
+**Status:** ✅ Stable baseline — ready for next iteration (v1.1.x CI matrix + hardened pipelines)
+
+---
+
+### Versión ESP
+
+**Resumen del Release:**  
+Se consolida la primera versión estable del repositorio AEDRON Dev Pro Portfolio, estableciendo una arquitectura unificada y orientada al código para flujos de análisis y validación.
+Esta versión entrega una base productiva completa que integra generación de datos sintéticos y validación E2E SQL bajo una estructura modular con CI/CD.
+
+**Entregables Clave:**
+- 🧱 Pipeline SQL: Flujo completo E2E con Docker, PostgreSQL y carga dinámica de datos simulados.
+- 🧪 Módulo Fabric Mock: Generación de datos sintéticos y análisis de KPIs con cobertura de pruebas.
+- ⚙️ Makefiles Unificados: Estandarización de comandos para ejecución (generate, test, e2e, clean).
+- 🔄 Workflows CI/CD: Pruebas automatizadas, ejecución de notebooks, linting y control de commits convencionales.
+- 🗂️ Documentación Bilingüe: Descripción técnica, arquitectura, changelog automatizado y estructura coherente de README.
+
+**Versión:** v1.0.0  
+**Fecha:** 2025-11-10  
+**Estado:** ✅ Versión base estable — lista para la siguiente iteración (v1.1.x con matriz de pruebas y pipelines reforzados)
+
