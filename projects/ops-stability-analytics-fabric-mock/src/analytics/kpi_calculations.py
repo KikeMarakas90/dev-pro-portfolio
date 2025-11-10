@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from __future__ import annotations
 
 from pathlib import Path
@@ -45,13 +46,24 @@ def build_daily(df: pd.DataFrame) -> pd.DataFrame:
     return out
 
 def build_agent_weekly(df: pd.DataFrame) -> pd.DataFrame:
-    """Agrega métricas semanales por agente/equipo."""
+    """
+    Agrega métricas semanales por agente/equipo.
+    Incluye iso_year + iso_week y deja alias 'week' para compatibilidad.
+    """
     out = df.copy()
-    out["week"] = out["date"].dt.isocalendar().week.astype(int)
-    grp = out.groupby(["agent_id", "team_id", "week"], as_index=False).agg(
+    iso = out["date"].dt.isocalendar()
+    out["iso_year"] = iso.year.astype(int)
+    out["iso_week"] = iso.week.astype(int)
+
+    grp = out.groupby(
+        ["agent_id", "team_id", "iso_year", "iso_week"], as_index=False
+    ).agg(
         hours_mean=("productive_hours", "mean"),
         cases_mean=("cases_closed", "mean"),
     )
+
+    # 👉 alias retro-compatible que tu test espera
+    grp["week"] = grp["iso_week"]
     return grp
 
 def compute_stability(df_week: pd.DataFrame) -> pd.DataFrame:
@@ -65,20 +77,27 @@ def compute_stability(df_week: pd.DataFrame) -> pd.DataFrame:
 
     # Cuartiles (1..4). Menor CV = más estable.
     base = by_agent["cv_hours"]
+    # Si hay pocos valores únicos, qcut puede fallar; usamos duplicates='drop' y cast seguro.
     by_agent["quartile_efficiency"] = pd.qcut(
         base.fillna(base.median()),
         4,
         labels=[1, 2, 3, 4],
         duplicates="drop",
-    ).astype("int64", errors="ignore")
+    )
+    # Cast opcional a int cuando el binning conserva 4 bandas
+    if by_agent["quartile_efficiency"].notna().any():
+        try:
+            by_agent["quartile_efficiency"] = by_agent["quartile_efficiency"].astype("int64")
+        except Exception:
+            # Si se reduce el número de bins, dejamos categoría/objeto como está
+            pass
 
     return by_agent
 
 def flag_outliers(df_week: pd.DataFrame) -> pd.DataFrame:
     """
-    Marca outliers por equipo y semana usando IQR sobre 'hours_mean' y 'cases_mean'.
-    Implementación con groupby(...).transform(...) para evitar deprecations y
-    problemas de índice en pandas 2.x.
+    Marca outliers por equipo + año ISO + semana ISO (IQR).
+    Conserva alias 'week' para compatibilidad.
     """
     out = df_week.copy()
 
@@ -86,26 +105,26 @@ def flag_outliers(df_week: pd.DataFrame) -> pd.DataFrame:
         lo, hi = iqr_bounds(s)
         return (s.lt(lo) | s.gt(hi)).astype(int)
 
-    out["out_hours_flag"] = (
-        out.groupby(["team_id", "week"])["hours_mean"].transform(flag_series)
-    )
-    out["out_cases_flag"] = (
-        out.groupby(["team_id", "week"])["cases_mean"].transform(flag_series)
-    )
+    keys = ["team_id", "iso_year", "iso_week"]
+    out["out_hours_flag"] = out.groupby(keys)["hours_mean"].transform(flag_series)
+    out["out_cases_flag"] = out.groupby(keys)["cases_mean"].transform(flag_series)
+
+    # 👉 garantiza presencia de 'week'
+    if "week" not in out.columns:
+        out["week"] = out["iso_week"]
+
     return out
 
 # -----------------------------
 # Ejecución como script (E2E)
 # -----------------------------
 if __name__ == "__main__":
-    # Preferimos Parquet del lakehouse local.
     lh_root = Path("lakehouse_sim")
     raw_parquet = lh_root / "Files" / "raw" / "ops_daily.parquet"
 
     if raw_parquet.exists():
         raw = pd.read_parquet(raw_parquet)
     else:
-        # Fallback a CSV legacy (compatibilidad hacia atrás)
         raw_csv = Path("data/raw/ops_daily.csv")
         if not raw_csv.exists():
             raise FileNotFoundError(
@@ -119,7 +138,6 @@ if __name__ == "__main__":
     stability = compute_stability(weekly)
     weekly_flagged = flag_outliers(weekly)
 
-    # Salidas alineadas a lakehouse_sim (Parquet)
     tables_dir = lh_root / "Tables"
     tables_dir.mkdir(parents=True, exist_ok=True)
 

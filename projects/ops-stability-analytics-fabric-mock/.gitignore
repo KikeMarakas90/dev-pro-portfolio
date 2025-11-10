@@ -1,0 +1,57 @@
+# ----------------------------------------
+# ☁️ AEDRON / OPS-STABILITY-ANALYTICS-FABRIC-MOCK
+# Environment: Power BI + Fabric + Python local
+# ----------------------------------------
+
+# 🧩 Python & environment
+__pycache__/
+*.py[cod]
+.venv/
+.env/
+.env.local
+.pytest_cache/
+.mypy_cache/
+
+# 🧠 Notebooks temporales / checkpoints
+.ipynb_checkpoints/
+*.nbconvert/
+*.bak
+
+# 📊 Datasets y salidas simuladas
+lakehouse_sim/
+data/raw/*.parquet
+data/processed/*.parquet
+data/*.csv
+tmp/
+cache/
+*.feather
+*.h5
+
+# ⚙️ IDE / OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# 📦 Distribución
+build/
+dist/
+*.egg-info/
+*.egg
+
+# 🧪 Pruebas y logs
+.coverage
+htmlcov/
+pytestdebug.log
+junit.xml
+
+# 🔐 Claves y credenciales
+*.key
+*.crt
+*.pem
+*.json
+
+# 📘 Documentación temporal
+*.log
+*.tmp
+*.bak

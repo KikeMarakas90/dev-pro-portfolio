@@ -1,8 +1,40 @@
-pandas
-numpy
-pytest
-mkdocs
-mkdocs-material
-black
-ruff
-pyarrow
+# ============================================================
+# Dev Pro Portfolio (Root Requirements)
+# Shared dependencies across modular projects
+# ============================================================
+
+# Core scientific stack
+numpy>=1.26
+pandas>=2.2
+pyarrow>=16.0
+
+# Environment management
+python-dotenv>=1.0
+
+# Testing and coverage
+pytest>=8.3
+pytest-cov>=5.0
+
+# Code quality and formatting
+black>=24.3
+flake8>=7.0
+isort>=5.13
+
+# Documentation and reporting
+mkdocs>=1.5
+mkdocs-material>=9.5
+
+# CLI utilities (for Makefiles or scripts)
+rich>=13.7
+click>=8.1
+
+# Optional: future integration layer for unified pipeline
+fastapi>=0.115
+uvicorn>=0.30
+
+# ============================================================
+# Notes:
+# - Each subproject (SQL / Fabric Mock) keeps its own specific
+#   requirements.txt for isolated builds.
+# - This root file defines only cross-project tools and baseline libs.
+# ============================================================

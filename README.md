@@ -1,7 +1,6 @@
 <p align="center">
-  <img src="https://img.shields.io/badge/AEDRON_Data_&_Cloud_Intelligence-262626?style=for-the-badge&logo=databricks&logoColor=white" alt="AEDRON Banner"/>
+  <img src="https://img.shields.io/badge/Data_&_Cloud_Intelligence-262626?style=for-the-badge&logo=databricks&logoColor=white" alt="AEDRON Banner"/>
 </p>
-
 
 # 🧠 Dev Pro Portfolio – Jorge Enrique Rodríguez Aguilera
 
@@ -12,80 +11,72 @@
 
 ---
 
-> **EN:** Professional portfolio focused on **Business Intelligence, Cloud Integration, and Ethical Automation**, built as a modular laboratory for applied data engineering, analytics, and CI/CD in hybrid environments.
+## Overview / Descripción General
 
-> **ES:** Portafolio técnico orientado a **Business Intelligence, Integración Cloud y Automatización Ética**, diseñado como laboratorio modular para prácticas de ingeniería de datos, análisis avanzado y CI/CD en entornos híbridos.
+The **Dev Pro Portfolio** consolidates modular analytical and integration projects focused on  
+**Business Intelligence, Process Optimization, and Cloud Architecture**.
+
+Each subproject is independently executable yet shares a unified set of technical governance standards  
+to ensure scalability, resilience, and production readiness.
+
+El **Portafolio Dev Pro** consolida proyectos modulares orientados a la **Inteligencia de Negocios,  
+Optimización de Procesos y Arquitectura Cloud**, manteniendo consistencia técnica y trazabilidad entre entornos.
 
 ---
 
-## 🧩 Repository Structure | Estructura del Repositorio
+## Modules / Módulos
 
-```bash
+| Module | Purpose / Propósito | Stack Tecnológico |
+|--------|----------------------|-------------------|
+| **Fabric Mock Module** (`ops-stability-analytics-fabric-mock`) | Synthetic datasets and stability analytics for Power BI / Fabric integration | Python, Pandas, Parquet |
+| **SQL Module** (`ops-stability-analytics-sql`) | PostgreSQL pipelines, data seeding, and schema management with SQLAlchemy | Python, Docker, PostgreSQL |
+
+---
+
+## Repository Layout / Estructura del Repositorio
+
+```
 dev-pro-portfolio/
-│
-├── .github/workflows/       # CI/CD (pytest / build / coverage)
-├── cases/                   # Data analysis cases / Casos analíticos
-├── dashboards/              # Power BI dashboards, DAX templates
-├── docs/                    # Technical & executive documentation
-├── projects/                # Core projects & frameworks
-│   └── ops-stability-analytics/   # Fabric-ready validated project with CI/CD
-│
-├── scripts/                 # Utility & automation scripts
-├── LICENSE
-├── README.md
-└── requirements.txt
+├─ projects/
+│ ├─ ops-stability-analytics-fabric-mock/
+│ └─ ops-stability-analytics-sql/
+├─ docs/
+│ └─ ARCHITECTURE.md
+├─ scripts/
+└─ .github/workflows/
 ```
-
-## 🚀 Active Projects | Proyectos Activos
-
-| Project | Description | Estado | Stack |
-|----------|--------------|--------|--------|
-| [**Ops Stability Analytics**](projects/ops-stability-analytics) | **EN:** End-to-end Fabric-ready pipeline for synthetic data generation, KPI computation (CV, CVM, IQR), and CI/CD validation.<br>**ES:** Pipeline local “Fabric-ready” para generación de datos sintéticos, cálculo de KPIs (CV, CVM, IQR) y validación CI/CD. | 🟢 Active / Activo | Python, PyArrow, Pandas, PyTest, Power BI |
-| *(coming soon)* **AEDRON Integrator Framework (AIF)** | **EN:** Composable middleware for cloud-agnostic integrations with embedded governance.<br>**ES:** Middleware composable, Python-native y vendor-agnostic con gobernanza integrada. | 🟡 Design / En diseño | Python, FastAPI, Azure/AWS SDK |
 
 ---
 
-## ⚙️ Development Environment | Entorno de Desarrollo
+## Test Matrix / Matriz de Pruebas
 
-### Create virtual environment / Crear entorno virtual
+| Test Type | Module | Status |
+|------------|---------|--------|
+| Unit tests (Pytest) | Fabric Mock | ✅ Passed |
+| E2E smoke (Make + Docker + SQLAlchemy) | SQL | ✅ Passed |
+| CI-ready (future) | Root pipeline | ⚙️ Planned |
 
-```bash
-python -m venv .venv
-source .venv/bin/activate
-```
+---
 
-### Install dependencies / Instalar dependencias
+## Technical Standards / Estándares Técnicos
 
-```bash
-pip install -r requirements.txt
-```
+- Environment control: `.env`, `.env.local`
+- Versioning: Semantic (`v1.0.0`)
+- CI/CD: GitHub Actions
+- Tests: `pytest` / `make`
+- Documentation: Markdown bilingual
 
-### Run pipeline (subproject) / Ejecutar pipeline
+---
 
-```bash
-cd projects/ops-stability-analytics
-make run
-```
+## Author / Autor
 
-## 🧪 CI/CD Pipeline
-
-- **Automation / Automatización:** GitHub Actions + PyTest  
-- **Validation / Validación:** modular structure + unit tests in `src/tests`  
-- **Results / Resultados:** pipeline verified (`2 passed in <1s>`)  
-- **Objective / Objetivo:** reproducible BI / DataOps workflows with enterprise best practices  
-
-## 🧭 Author | Autor
-
-**Jorge Enrique Rodríguez Aguilera**
-
-**Consultor en Business Intelligence, Cloud Integrations & Data Governance.**
-
-**📍 México**
-
+**Jorge Enrique Rodríguez Aguilera**  
+Consultor en Business Intelligence, Cloud Integrations & Data Governance  
+📍 México  
 🔗 [LinkedIn](https://www.linkedin.com/in/enrique-rodr%C3%ADguez-007236243)
 
-## 🪶 License | Licencia
-Distributed under the MIT License.
-Consulta el archivo LICENSE para más detalles.
-
 ---
+
+## License / Licencia
+Distributed under the MIT License.  
+Consulta el archivo LICENSE para más detalles.

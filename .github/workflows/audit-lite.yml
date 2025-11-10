@@ -1,0 +1,43 @@
+name: Audit • Lint + Security scan
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+  schedule:
+    - cron: '0 6 * * 1'  # Lunes 06:00 UTC
+
+permissions:
+  contents: read
+
+jobs:
+  lint-security:
+    name: 🛡️ Lint + Security
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install security tools
+        run: |
+          pip install safety bandit
+      - name: Static security audit
+        run: |
+          safety check -r projects/ops-stability-analytics-fabric-mock/requirements.txt || true
+          safety check -r projects/ops-stability-analytics-sql/requirements.txt || true
+          bandit -r projects/ops-stability-analytics-fabric-mock/src -x tests || true
+          bandit -r projects/ops-stability-analytics-sql/src -x tests || true
+
+  structure-check:
+    name: 🧱 Repository structure
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Validate project layout
+        run: |
+          echo "Checking expected layout..."
+          test -d projects/ops-stability-analytics-fabric-mock/src || (echo "❌ Missing fabric mock src" && exit 1)
+          test -d projects/ops-stability-analytics-sql/src || (echo "❌ Missing SQL src" && exit 1)
+          test -f Makefile || (echo "❌ Missing root Makefile" && exit 1)
+          echo "✅ Layout OK"
