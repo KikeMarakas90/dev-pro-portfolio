@@ -107,11 +107,16 @@ jobs:
       - name: Validate commit format
         run: |
           base="${{ github.base_ref }}"
-          head="${{ github.head_ref }}"
           range="origin/$base..HEAD"
-          if git log --no-merges --pretty=%s $range | grep -Ev '^(feat|fix|chore|refactor|perf|test|docs?|build|ci)(\(.+\))?: .+' >/dev/null; then
+          echo "🔎 Checking Conventional Commits in range: $range"
+          echo "— Commit subjects in range —"
+          git log --no-merges --pretty=%s $range || true
+          echo "— Offenders (if any) —"
+          offenders=$(git log --no-merges --pretty=%s $range | grep -Ev '^(feat|fix|chore|refactor|perf|test|docs?|build|ci)(\(.+\))?: .+' || true)
+          if [ -n "$offenders" ]; then
+            echo "$offenders"
             echo "❌ Some commits don't match Conventional Commits."
             exit 1
           else
             echo "✅ Conventional commits OK"
-          fi
+          fi  
