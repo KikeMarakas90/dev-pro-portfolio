@@ -29,21 +29,21 @@ jobs:
           pip install -r requirements.txt
           # Necesarios para ejecutar notebooks en CI
           pip install jupyter nbconvert nbclient ipykernel
-      
-      - name: Execute Fabric notebooks
-        working-directory: projects/ops-stability-analytics-fabric-mock
+
+      - name: Execute Fabric notebooks (if present)
         run: |
-          # Ejecuta notebooks en la carpeta notebooks/
-          jupyter nbconvert --to notebook --execute notebooks/01_Generate_Synthetic_Data.ipynb --inplace
-          jupyter nbconvert --to notebook --execute notebooks/02_Calculate_KPIs.ipynb --inplace
-          
+          if compgen -G "notebooks/*.ipynb" > /dev/null; then
+            echo "➡️ Ejecutando notebooks en notebooks/…"
+            for nb in notebooks/*.ipynb; do
+              echo "Running: $nb"
+              jupyter nbconvert --to notebook --execute "$nb" --inplace
+            done
+          else
+            echo "ℹ️ No se encontraron notebooks en notebooks/. Se omite esta etapa."
+          fi
+
       - name: Run pytest (fabric)
         run: pytest -q --tb=short --disable-warnings
-
-      - name: Execute notebooks (fabric)
-        run: |
-          jupyter nbconvert --to notebook --execute 01_Generate_Synthetic_Data.ipynb --inplace
-          jupyter nbconvert --to notebook --execute 02_Calculate_KPIs.ipynb --inplace
 
   sql-e2e:
     name: 🧱 SQL • Full E2E pipeline
