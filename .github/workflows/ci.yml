@@ -34,8 +34,8 @@ jobs:
         working-directory: projects/ops-stability-analytics-fabric-mock
         run: |
           # Ejecuta notebooks en la carpeta notebooks/
-          jupyter nbconvert --to notebook --execute notebooks/01_generate_synthetic_data.ipynb --inplace
-          jupyter nbconvert --to notebook --execute notebooks/02_calculate_kpis.ipynb --inplace
+          jupyter nbconvert --to notebook --execute notebooks/01_Generate_Synthetic_Data.ipynb --inplace
+          jupyter nbconvert --to notebook --execute notebooks/02_Calculate_KPIs.ipynb --inplace
           
       - name: Run pytest (fabric)
         run: pytest -q --tb=short --disable-warnings
