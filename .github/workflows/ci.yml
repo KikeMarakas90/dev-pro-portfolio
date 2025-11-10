@@ -29,7 +29,14 @@ jobs:
           pip install -r requirements.txt
           # Necesarios para ejecutar notebooks en CI
           pip install jupyter nbconvert nbclient ipykernel
-
+      
+      - name: Execute Fabric notebooks
+        working-directory: projects/ops-stability-analytics-fabric-mock
+        run: |
+          # Ejecuta notebooks en la carpeta notebooks/
+          jupyter nbconvert --to notebook --execute notebooks/01_generate_synthetic_data.ipynb --inplace
+          jupyter nbconvert --to notebook --execute notebooks/02_calculate_kpis.ipynb --inplace
+          
       - name: Run pytest (fabric)
         run: pytest -q --tb=short --disable-warnings
 
