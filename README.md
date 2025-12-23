@@ -78,5 +78,5 @@ Consultor en Business Intelligence, Cloud Integrations & Data Governance
 ---
 
 ## License / Licencia
-Distributed under the MIT License.  
+Distributed under the MIT License. 
 Consulta el archivo LICENSE para más detalles.
